@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Generate TOC</title>
+		<style>
+			body {
+				margin-top:2em;
+			}
+			* {
+				font-family:consolas;
+				color:white;
+				background-color:black;
+			}
+			textarea {
+				display:block;
+				margin:1em 0;
+				width:46em;
+				height:16em;
+				padding:1em 1em;
+			}
+			button {
+				border:2px solid lightgreen;
+				border-radius:1em;
+				padding:1em 2em;
+			}
+		</style>
+	</head>
+	<body>
+		<center>
+		<textarea id="input"></textarea>
+		<button onclick="getTOC()">Get TOC</button>
+		<textarea id="output" readonly></textarea>
+		<script>
+		function getTOC(){
+			let toc = ""
+			let lines = document.getElementById("input").value.split('\n');
+			for (let line of lines){
+				if (line.length < 3){continue}
+				if (line[0] == '#' && (line[1] == ' ' || line[1] == '#')){
+					toc += '\n';
+					let indenting = true
+					let contentTitle = '';
+					let contentId = '';
+					for (let c of line.slice(1, line.length)){
+						if (c == " " && indenting){
+							indenting = false
+							toc += '- '
+							continue
+						}
+						if (indenting){
+							toc += "  "
+						} else{
+							contentTitle += c;
+							if (c == ' '){
+								contentId += '-'
+							} else if ("\\'\"!@#$%^&*()+{}:|[];/.,<>?".indexOf(c) == -1){
+								contentId += c.toLowerCase()
+							}
+						}
+					}
+					toc += `[${contentTitle}](#${contentId})`;
+				}
+			}
+			let output = document.getElementById("output")
+			output.readOnly = false
+			output.value = toc;
+			output.readOnly = true
+		}
+		</script>
+	</body>
+</html>
